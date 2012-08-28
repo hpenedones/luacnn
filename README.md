@@ -3,17 +3,14 @@ luacnn
 
 simple example of convolutional neural networks for hand digit recognition 
 
-Requirements:
+Requirements
+-------
 
 Torch5 machine learning library
 lua language interpreter (which comes with torch).
 
-Credits:
-
-David Grangier, Ronan Collobert (mentoring/collaboration during my 2010 Summer internship at NEC Labs, Princeton).
-
-
 Description:
+-------
 
 Each image contains a total 1100 examples of that digit (organized in 33 columns and 34 rows). 
 Each example is 16x16 pixel. We will use 1000 samples for training and the remaining for testing.
@@ -27,34 +24,43 @@ Here we actually use a LogSoftMax which gives log-probabilities.
 
 
 Performance:
+-------
 
 In this setup, I obtained test errors around 3% or 4%. 
 Note that training the network with stochastic gradient descent will give you slightly different results each time you do it (because there is randomness selecting the next training sample).
 
 
 Possible improvements:
+-------
 
 I tried to keep this example as simple as possible, but one can expand it in several directions:
 
-    Speeding-up training:
+### Speeding-up training:
 
-    Normalize data before training
-    Learning rate dependent on number of neurons in layer
+  *  Normalize data before training
+  *  Learning rate dependent on number of neurons in layer
 
-    Model selection:
+### Model selection:
 
-    Use a validation dataset to avoid over-fitting
+  *  Use a validation dataset to avoid over-fitting
 
-    Visualization:
+### Visualization:
 
-    Show current error during training
-    Display wrong classified examples at test time   
+  *  Show current error during training
+  *  Display wrong classified examples at test time   
 
-    Multi-task:
+### Multi-task:
 
-    Imagine you want now to recognize letters. One can jointly train two networks (one for digits and another for letters) and share the first layer parameters of the networks. This is really easy in torch5, using the clone and share methods.  
+   * Imagine you want now to recognize letters. One can jointly train two networks (one for digits and another for letters) and share the first layer parameters of the networks. This is really easy in torch5, using the clone and share methods.  
+
+
+Credits:
+-------
+David Grangier, Ronan Collobert (mentoring/collaboration during my 2010 Summer internship at NEC Labs, Princeton).
+
 
 Recommended reading:
+-------
 
 Y. LeCun, L. Bottou, G. Orr and K. Muller: Efficient BackProp, in Orr, G. and Muller K. (Eds), Neural Networks: Tricks of the trade, Springer, 1998 (download pdf)
 
