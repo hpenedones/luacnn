@@ -6,7 +6,7 @@ Simple example of how to use torch5 convolutional neural networks for hand digit
 Requirements
 -------
 
-* Torch5 machine learning library
+* Torch7 machine learning library
 * lua language interpreter (which comes with torch).
 
 Description
@@ -51,7 +51,7 @@ I tried to keep this example as simple as possible, but one can expand it in sev
 
 ### Multi-task
 
-   * Imagine you want now to recognize letters. One can jointly train two networks (one for digits and another for letters) and share the first layer parameters of the networks. This is really easy in torch5, using the clone and share methods.  
+   * Imagine you want now to recognize letters. One can jointly train two networks (one for digits and another for letters) and share the first layer parameters of the networks. This is really easy in torch7, using the clone and share methods.  
 
 
 Credits
