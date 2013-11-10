@@ -1,4 +1,3 @@
-
 require "torch"
 require "image"
 require "nn"
@@ -22,7 +21,7 @@ total_examples_per_class=1100
 
 inputs=sub_image_height*sub_image_width
 
-learningRate = 0.01
+learningRate = 0.003
 maxIterations = 100000
 
 GUI_ON = false
@@ -66,7 +65,6 @@ function create_dataset(classes, first_index, last_index)
 
     local dataset={};
     function dataset:size() return #classes*nsamples_per_class end
-    
 
     local index = 0
 
@@ -79,22 +77,24 @@ function create_dataset(classes, first_index, last_index)
         end
     end
 
-
-
     return dataset
 end
 
 -- here we set up the architecture of the neural network
 function create_network(nb_outputs)
 
-    local ann = nn.Sequential();  -- make a multi-layer structure
+    local ann = nn.Sequential()  -- make a multi-layer structure
+    local size = 16
+    local filter_size, filter_num, subsample_size, subsample_step=5, 6, 2, 2
                                                 -- 16x16x1                
-    ann:add(nn.SpatialConvolution(1,6,5,5))   -- becomes 12x12x6
-    ann:add(nn.SpatialSubSampling(6,2,2,2,2)) -- becomes  6x6x6 
-
-    ann:add(nn.Reshape(6*6*6))
+    ann:add(nn.SpatialConvolution(1, filter_num, filter_size, filter_size))   -- becomes 12x12x6
+    ann:add(nn.SpatialSubSampling(filter_num, subsample_size, subsample_size, subsample_step, subsample_step)) -- becomes  6x6x6 
+    local l2size=size-filter_size+1
+    local unit_size=(l2size-subsample_size)/subsample_step+1
+    local unit_num=filter_num*unit_size*unit_size
+    ann:add(nn.Reshape(unit_num))
     ann:add(nn.Tanh())
-    ann:add(nn.Linear(6*6*6,nb_outputs))
+    ann:add(nn.Linear(unit_num, nb_outputs))
     ann:add(nn.LogSoftMax())
     
     return ann
@@ -146,7 +146,7 @@ function test_predictor(predictor, test_dataset, classes, classes_names)
             mistakes = mistakes + 1
             local label = classes_names[ classes[class_id] ]
             local predicted_label = classes_names[ classes[prediction[1] ] ]
-            print("", i, label, predicted_label )
+            print("", "error:", i, label, predicted_label )
         end
 
         tested_samples = tested_samples + 1
