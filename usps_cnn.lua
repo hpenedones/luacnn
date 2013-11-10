@@ -27,8 +27,6 @@ maxIterations = 100000
 
 GUI_ON = false
 
-print("OK")
-
 function load_data_from_disk(folder)
     for i=1,10 do
         local filename = string.format(name_format,i-1)
@@ -112,11 +110,11 @@ function train_network( network, dataset)
         local index = math.random(dataset:size()) -- pick example at random
         local input = dataset[index][1]        
         local output = dataset[index][2]
-        if iteration%2000==0 then
-            print("iteration: "..iteration, "index: "..index, "input.size:", input:size(), "output: ", output)
+        if iteration%5000==0 then
+            print("\titeration: "..iteration.."/"..maxIterations)
         end
-        inp=network:forward(input)
-        criterion:forward(inp, output)
+        
+        criterion:forward(network:forward(input), output)
 
         network:zeroGradParameters()
         network:backward(input, criterion:backward(network.output, output))
@@ -134,7 +132,7 @@ function test_predictor(predictor, test_dataset, classes, classes_names)
     
     print( "----------------------" )
     print( "Index Label Prediction" )
-    for i=1,test_dataset:size() do
+    for i=1, test_dataset:size() do
 
         local input  = test_dataset[i][1]
         local class_id = test_dataset[i][2]
@@ -148,14 +146,14 @@ function test_predictor(predictor, test_dataset, classes, classes_names)
             mistakes = mistakes + 1
             local label = classes_names[ classes[class_id] ]
             local predicted_label = classes_names[ classes[prediction[1] ] ]
-            print(i , label , predicted_label )
+            print("", i, label, predicted_label )
         end
 
         tested_samples = tested_samples + 1
     end
 
     local test_err = mistakes*100/tested_samples
-    print ( "Test error " .. test_err .. "% ( " .. mistakes .. " out of " .. tested_samples .. " )")
+    print ("Test error " .. test_err .. "% ( " .. mistakes .. " out of " .. tested_samples .. " )")
 
 end
 
@@ -172,6 +170,8 @@ function main()
     local network = create_network(#classes)
 
     print("training_dataset:", training_dataset:size())
+    print("testing_dataset :", testing_dataset:size())
+
     train_network(network, training_dataset)
     
     test_predictor(network, testing_dataset, classes, classes_names)
