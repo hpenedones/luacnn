@@ -82,9 +82,10 @@ end
 
 -- here we set up the architecture of the neural network
 function create_network(nb_outputs)
+    local size = 16
+    print("create_network: input image size=", size, "output number:", nb_outputs)
 
     local ann = nn.Sequential()  -- make a multi-layer structure
-    local size = 16
     local filter_size, filter_num, subsample_size, subsample_step=5, 6, 2, 2
                                                 -- 16x16x1                
     ann:add(nn.SpatialConvolution(1, filter_num, filter_size, filter_size))   -- becomes 12x12x6
@@ -113,8 +114,9 @@ function train_network( network, dataset)
         if iteration%5000==0 then
             print("\titeration: "..iteration.."/"..maxIterations)
         end
-        
-        criterion:forward(network:forward(input), output)
+        local inp=network:forward(input)
+        if iteration==1 then print(input:size(), output, inp:size(), dataset:size()) end
+        criterion:forward(inp, output)
 
         network:zeroGradParameters()
         network:backward(input, criterion:backward(network.output, output))
