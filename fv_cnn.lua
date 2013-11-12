@@ -4,13 +4,16 @@ require "nn"
 require "math"
 require "paths"
 
+image_width=32
+
 function loadBMP(fn)
     local s=io.open(fn,"rb"):read("*all")
     local d={}
     local i=0
     for i=1,128*128 do d[i]=s:byte(1078+i)/255 end
     local ret = torch.Tensor(d)
-    return ret:resize(1, 128, 128)
+    ret=image.scale(ret:resize(128, 128), image_width, image_width)
+    return ret:resize(1, image_width, image_width)
 end
 
 --print(loadBMP("/media/d/work/fv/Camera/fv-images/norm/1_1.bmp"))
@@ -44,18 +47,43 @@ function create_dataset(path, test_num)
             end
         end
     end
-    test={}
-    train={}
+    local test={}
+    local train={}
+    local images = {}
+    local image_count = {}
+    for i=1, #names do
+        images[i]=torch.Tensor((image_width+1)*10, (image_width+1)*10)
+        images[i]:fill(0)
+        image_count[i]=0
+    end
+    local test_tag=torch.Tensor(5,5)
+    test_tag:fill(1)
     for i=1, #all_index do
         local files=all_index[i]
         for index=1, #files do
             local data=dataset[files[index]]
+            local c=image_count[data[2]]
+            local x,y=c%10,0
+            y=(c-x)/10
+            print('class:'..data[2], 'image count:'..c, 'col:'..x, 'row:'..y)
+            if y<10 then
+                x, y=x*(image_width+1), y*(image_width+1)
+                local image=images[data[2]]
+                image[{{y+1, y+image_width}, {x+1, x+image_width}}]=data[1]
+                if index>=#files-test_num then -- for test, show a tag
+                    image[{{y+1, y+5}, {x+1, x+5}}]=test_tag
+                end
+                image_count[data[2]]=c+1
+            end
             if index < #files-test_num then
                 train[#train+1]=data
             else
                 test[#test+1]=data
             end
         end
+    end
+    for i=1, #names do
+        image.save(names[i]..'.jpg', images[i])
     end
     return names, train, test
 end
@@ -64,7 +92,7 @@ end
 function create_network(size, nb_outputs)
     print("create_network: input image size="..size..",", "output number:"..nb_outputs)
     local ann = nn.Sequential()  -- make a multi-layer structure
-    local filter_size, filter_num, subsample_size, subsample_step=15, 64, 6, 6
+    local filter_size, filter_num, subsample_size, subsample_step=7, 16, 2, 2
                                                 -- 16x16x1
     ann:add(nn.SpatialConvolution(1, filter_num, filter_size, filter_size))   -- becomes 12x12x6
     ann:add(nn.SpatialSubSampling(filter_num, subsample_size, subsample_size, subsample_step, subsample_step)) -- becomes  6x6x6 
@@ -87,7 +115,7 @@ end
 function train_network( network, dataset)
         
     local learningRate = 0.01
-    local maxIterations = 10000
+    local maxIterations = 100000
 
     print( "Training the network" )
     local criterion = nn.ClassNLLCriterion()
@@ -132,7 +160,7 @@ function test_predictor(predictor, test_dataset, classes_names)
             mistakes = mistakes + 1
             local label = classes_names[ class_id ]
             local predicted_label = classes_names[ prediction[1] ]
-            print("", "error:", i, label, predicted_label )
+            print("", "error:", test_dataset[i][3], i, label, predicted_label )
         end
 
         tested_samples = tested_samples + 1
@@ -152,7 +180,7 @@ function main()
     print("training_dataset:", #training_dataset)
     print("testing_dataset :", #testing_dataset)
 
-    local network = create_network(128, #classes_names)
+    local network = create_network(image_width, #classes_names)
 
     train_network(network, training_dataset)
     
