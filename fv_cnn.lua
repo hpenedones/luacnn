@@ -4,7 +4,9 @@ require "nn"
 require "math"
 require "paths"
 
-image_width=32
+image_width=44
+learningRate = 0.01
+maxIterations = 10000
 
 function loadBMP(fn)
     local s=io.open(fn,"rb"):read("*all")
@@ -65,7 +67,7 @@ function create_dataset(path, test_num)
             local c=image_count[data[2]]
             local x,y=c%10,0
             y=(c-x)/10
-            print('class:'..data[2], 'image count:'..c, 'col:'..x, 'row:'..y)
+            --print('class:'..data[2], 'image count:'..c, 'col:'..x, 'row:'..y)
             if y<10 then
                 x, y=x*(image_width+1), y*(image_width+1)
                 local image=images[data[2]]
@@ -92,7 +94,7 @@ end
 function create_network(size, nb_outputs)
     print("create_network: input image size="..size..",", "output number:"..nb_outputs)
     local ann = nn.Sequential()  -- make a multi-layer structure
-    local filter_size, filter_num, subsample_size, subsample_step=7, 16, 2, 2
+    local filter_size, filter_num, subsample_size, subsample_step=15, 40, 3, 3
                                                 -- 16x16x1
     ann:add(nn.SpatialConvolution(1, filter_num, filter_size, filter_size))   -- becomes 12x12x6
     ann:add(nn.SpatialSubSampling(filter_num, subsample_size, subsample_size, subsample_step, subsample_step)) -- becomes  6x6x6 
@@ -114,9 +116,6 @@ end
 -- train a Neural Netowrk
 function train_network( network, dataset)
         
-    local learningRate = 0.01
-    local maxIterations = 100000
-
     print( "Training the network" )
     local criterion = nn.ClassNLLCriterion()
     
@@ -124,7 +123,7 @@ function train_network( network, dataset)
         local index = math.random(#dataset) -- pick example at random
         local input = dataset[index][1]        
         local output = dataset[index][2]
-        if iteration%1000==0 then
+        if iteration%2000==0 then
             print("\titeration: "..iteration.."/"..maxIterations)
         end
         local inp=network:forward(input)
@@ -175,7 +174,7 @@ end
 -- main routine
 function main()
 
-    local classes_names, training_dataset, testing_dataset = create_dataset('/media/d/work/fv/Camera/fv-images/norm/', 2)
+    local classes_names, training_dataset, testing_dataset = create_dataset('/media/d/work/fv/Camera/fv-images/norm/', 7)
     print("classes number:", #classes_names)
     print("training_dataset:", #training_dataset)
     print("testing_dataset :", #testing_dataset)
