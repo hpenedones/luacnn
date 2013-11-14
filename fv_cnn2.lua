@@ -4,7 +4,7 @@ require "nn"
 require "math"
 require "paths"
 
-image_width=44
+image_width = 49
 learningRate = 0.01
 maxIterations = 10000
 
@@ -94,22 +94,32 @@ end
 function create_network(size, nb_outputs)
     print("create_network: input image size="..size..",", "output number:"..nb_outputs)
     local ann = nn.Sequential()  -- make a multi-layer structure
-    local filter_size, filter_num, subsample_size, subsample_step=15, 40, 3, 3
+    local filter_size, filter_num, subsample_size, subsample_step=5, 15, 3, 3
+    local filter_size2, filter_num2, subsample_size2, subsample_step2=7, 12, 3, 3
                                                 -- 16x16x1
+    print('  1@'..size..'x'..size)
     ann:add(nn.SpatialConvolution(1, filter_num, filter_size, filter_size))   -- becomes 12x12x6
-    ann:add(nn.SpatialSubSampling(filter_num, subsample_size, subsample_size, subsample_step, subsample_step)) -- becomes  6x6x6 
     local l2size=size-filter_size+1
+    print(' -> '..filter_num..'@'..l2size..'x'..l2size)
+    ann:add(nn.SpatialSubSampling(filter_num, subsample_size, subsample_size, subsample_step, subsample_step)) -- becomes  6x6x6 
     local unit_size=(l2size-subsample_size)/subsample_step+1
+    print(' -> '..filter_num..'@'..unit_size..'x'..unit_size)
+    -- ann:add(nn.Reshape(filter_num, unit_size, unit_size))
+    ann:add(nn.SpatialConvolution(filter_num, filter_num*filter_num2, filter_size2, filter_size2))   -- becomes 12x12x6
+    local l2size=unit_size-filter_size2+1
+    filter_num=filter_num*filter_num2
+    print(' -> '..filter_num..'@'..l2size..'x'..l2size)
+    ann:add(nn.SpatialSubSampling(filter_num, subsample_size2, subsample_size2, 
+        subsample_step2, subsample_step2)) -- becomes  6x6x6 
+    unit_size=(l2size-subsample_size2)/subsample_step2+1
+    print(' -> '..filter_num..'@'..unit_size..'x'..unit_size)
     local unit_num=filter_num*unit_size*unit_size
-    print('  1@'..size..'x'..size..
-        ' -> '..filter_num..'@'..l2size..'x'..l2size..
-        ' -> '..filter_num..'@'..unit_size..'x'..unit_size..
-        ' -> '..nb_outputs)
     ann:add(nn.Reshape(unit_num))
+    print(' -> '..unit_num)
     ann:add(nn.Tanh())
     ann:add(nn.Linear(unit_num, nb_outputs))
     ann:add(nn.LogSoftMax())
-    
+    print(' -> '..nb_outputs)
     return ann
 end
 
