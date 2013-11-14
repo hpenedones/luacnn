@@ -58,6 +58,8 @@ function create_dataset(path, test_num)
         images[i]:fill(0)
         image_count[i]=0
     end
+    local tsum=torch.Tensor(1, image_width, image_width)
+    tsum:fill(0)
     local test_tag=torch.Tensor(5,5)
     test_tag:fill(1)
     for i=1, #all_index do
@@ -79,6 +81,7 @@ function create_dataset(path, test_num)
             end
             if index < #files-test_num then
                 train[#train+1]=data
+                tsum=tsum+data[1]
             else
                 test[#test+1]=data
             end
@@ -87,6 +90,9 @@ function create_dataset(path, test_num)
     for i=1, #names do
         image.save(names[i]..'.jpg', images[i])
     end
+    tsum=tsum/#train
+    for i=1, #train do train[i][1]=train[i][1]-tsum end
+    for i=1, #test do test[i][1]=test[i][1]-tsum end
     return names, train, test
 end
 

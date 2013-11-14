@@ -4,7 +4,7 @@ require "nn"
 require "math"
 require "paths"
 
-image_width=44
+image_width= 39
 learningRate = 0.01
 maxIterations = 10000
 
@@ -94,7 +94,7 @@ end
 function create_network(size, nb_outputs)
     print("create_network: input image size="..size..",", "output number:"..nb_outputs)
     local ann = nn.Sequential()  -- make a multi-layer structure
-    local filter_size, filter_num, subsample_size, subsample_step=15, 40, 3, 3
+    local filter_size, filter_num, subsample_size, subsample_step=13, 40, 3, 3
                                                 -- 16x16x1
     ann:add(nn.SpatialConvolution(1, filter_num, filter_size, filter_size))   -- becomes 12x12x6
     ann:add(nn.SpatialSubSampling(filter_num, subsample_size, subsample_size, subsample_step, subsample_step)) -- becomes  6x6x6 
