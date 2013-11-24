@@ -93,11 +93,15 @@ end
 -- here we set up the architecture of the neural network
 function create_network(size, nb_outputs)
     print("create_network: input image size="..size..",", "output number:"..nb_outputs)
+    local normkernel1 = image.gaussian1D(21)
+    local normkernel2 = image.gaussian1D(15)
     local ann = nn.Sequential()  -- make a multi-layer structure
     local filter_size, filter_num, subsample_size, subsample_step=13, 40, 3, 3
                                                 -- 16x16x1
+    ann:add(nn.SpatialSubtractiveNormalization(1, normkernel1))
     ann:add(nn.SpatialConvolution(1, filter_num, filter_size, filter_size))   -- becomes 12x12x6
     ann:add(nn.SpatialSubSampling(filter_num, subsample_size, subsample_size, subsample_step, subsample_step)) -- becomes  6x6x6 
+    ann:add(nn.SpatialSubtractiveNormalization(filter_num, normkernel2))
     local l2size=size-filter_size+1
     local unit_size=(l2size-subsample_size)/subsample_step+1
     local unit_num=filter_num*unit_size*unit_size
@@ -159,7 +163,8 @@ function test_predictor(predictor, test_dataset, classes_names)
             mistakes = mistakes + 1
             local label = classes_names[ class_id ]
             local predicted_label = classes_names[ prediction[1] ]
-            print("", "error:", test_dataset[i][3], i, label, predicted_label )
+            print(probabilites_per_class)
+            print("", "error:", test_dataset[i][3], label..'('..class_id..') -> '..predicted_label..'('..prediction[1]..')' )
         end
 
         tested_samples = tested_samples + 1
