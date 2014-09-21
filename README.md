@@ -1,13 +1,13 @@
 luacnn
 ======
 
-Simple example of how to use torch5 convolutional neural networks for hand digit recognition, on the usps dataset. 
+Simple example of how to use torch7 convolutional neural networks for hand digit recognition, on the usps dataset. 
 
 Requirements
 -------
 
-* Torch5 machine learning library
-* lua language interpreter (which comes with torch).
+* Torch7 machine learning library
+* lua language interpreter
 
 Description
 -------
