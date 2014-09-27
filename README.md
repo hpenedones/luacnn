@@ -48,12 +48,12 @@ I tried to keep this example as simple as possible, but one can expand it in sev
 
 ##### Multi-task
 
-   * Imagine you want now to recognize letters. One can jointly train two networks (one for digits and another for letters) and share the first layer parameters of the networks. This is really easy in torch5, using the clone and share methods.  
+   * Imagine you want now to recognize letters. One can jointly train two networks (one for digits and another for letters) and share the first layer parameters of the networks. This is really easy in torch, using the clone and share methods.  
 
 
 #### Credits
 
-David Grangier, Ronan Collobert (mentoring/collaboration during my 2010 Summer internship at NEC Labs, Princeton).
+David Grangier, Ronan Collobert (mentoring/collaboration during my 2010 Summer internship at NEC Labs, Princeton, US and at Idiap Research Institute, Switzerland).
 
 
 #### Recommended reading
