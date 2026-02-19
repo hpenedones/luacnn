@@ -1,0 +1,9 @@
+# StyLua configuration file
+# See https://github.com/JohnnyMorganz/StyLua for more options
+
+column_width = 120
+line_endings = "Unix"
+indent_type = "Tabs"
+indent_width = 1
+quote_style = "AutoPreferDouble"
+call_parentheses = "Always"

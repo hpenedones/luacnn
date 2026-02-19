@@ -6,8 +6,17 @@ Simple example of how to use torch7 convolutional neural networks for hand digit
 #### Requirements
 
 * Torch7 machine learning library (www.torch.ch)
-* image torch package 
+* image torch package
 * qtlua torch package (if you want to visualize the data)
+
+#### Development Setup
+
+To set up the git pre-commit hook that automatically formats Lua code with StyLua:
+
+1. Install StyLua (see https://github.com/JohnnyMorganz/StyLua#installation)
+2. Run the setup script: `./setup-hooks.sh`
+
+The pre-commit hook will automatically format any staged Lua files before each commit.
 
 
 #### Description
