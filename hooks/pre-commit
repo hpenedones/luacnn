@@ -1,0 +1,28 @@
+#!/bin/bash
+# Git pre-commit hook to run StyLua formatter on Lua files
+
+# Find all staged Lua files
+LUA_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep '\.lua$')
+
+# Exit early if no Lua files are staged
+if [ -z "$LUA_FILES" ]; then
+    exit 0
+fi
+
+# Check if stylua is installed
+if ! command -v stylua &> /dev/null; then
+    echo "Error: stylua is not installed or not in PATH"
+    echo "Please install StyLua: https://github.com/JohnnyMorganz/StyLua#installation"
+    echo "Or download from: https://github.com/JohnnyMorganz/StyLua/releases/latest"
+    exit 1
+fi
+
+# Run stylua on staged Lua files
+echo "Running StyLua formatter on staged Lua files..."
+stylua $LUA_FILES
+
+# Add the formatted files back to staging
+git add $LUA_FILES
+
+echo "StyLua formatting complete!"
+exit 0
